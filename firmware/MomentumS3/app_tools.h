@@ -58,15 +58,15 @@ static void appSnake() {
     }
     cv.clear();
     cv.setFont(FontSecondary);
-    char b[32]; snprintf(b, sizeof b, "Score: %d", score); cv.drawStr(2, 8, b);
-    snprintf(b, sizeof b, "Best: %d", best); cv.drawStr(126 - cv.strWidth(b), 8, b);
+    char b[32]; snprintf(b, sizeof b, T("Score: %d","Punkte: %d"), score); cv.drawStr(2, 8, b);
+    snprintf(b, sizeof b, T("Best: %d","Beste: %d"), best); cv.drawStr(126 - cv.strWidth(b), 8, b);
     cv.drawFrame(OX - 1, OY - 1, CW * CS + 2, CH * CS + 2);
     for (int i = 0; i < len; i++) cv.drawBox(OX + body[i].x * CS, OY + body[i].y * CS, CS - 1, CS - 1);
     cv.drawFrame(OX + food.x * CS, OY + food.y * CS, CS - 1, CS - 1);
     if (dead) {
       cv.setColor(ColorWhite); cv.drawBox(24, 22, 80, 26); cv.setColor(ColorBlack); cv.drawRFrame(24, 22, 80, 26, 3);
-      cv.setFont(FontPrimary); cv.drawStrAligned(64, 32, AlignCenter, AlignCenter, "Game Over");
-      cv.setFont(FontSecondary); cv.drawStrAligned(64, 42, AlignCenter, AlignCenter, "OK = again");
+      cv.setFont(FontPrimary); cv.drawStrAligned(64, 32, AlignCenter, AlignCenter, T("Game Over","Verloren"));
+      cv.setFont(FontSecondary); cv.drawStrAligned(64, 42, AlignCenter, AlignCenter, T("OK = again","OK = nochmal"));
     }
     cv.flush();
     delay(10);
@@ -92,10 +92,10 @@ static void appClock() {
     if (k != KeyNone) return;
     cv.clear();
     if (!timeValid()) {
-      cv.setFont(FontPrimary); cv.drawStrAligned(64, 20, AlignCenter, AlignCenter, "Time not set");
+      cv.setFont(FontPrimary); cv.drawStrAligned(64, 20, AlignCenter, AlignCenter, T("Time not set", "Keine Zeit"));
       cv.setFont(FontSecondary);
-      cv.drawStrAligned(64, 36, AlignCenter, AlignCenter, "Open Apps > Web Files");
-      cv.drawStrAligned(64, 46, AlignCenter, AlignCenter, "with your phone to sync");
+      cv.drawStrAligned(64, 36, AlignCenter, AlignCenter, T("Open Apps > Web Files", "Apps > Web Files oeffnen"));
+      cv.drawStrAligned(64, 46, AlignCenter, AlignCenter, T("with your phone to sync", "mit dem Handy zum Sync"));
     } else {
       time_t n = time(nullptr); struct tm t; localtime_r(&n, &t);
       char b[16]; snprintf(b, sizeof b, "%02d:%02d:%02d", t.tm_hour, t.tm_min, t.tm_sec);
@@ -141,7 +141,7 @@ static void appDice() {
     snprintf(b, sizeof b, "%d", val);
     if (val) cv.drawStrAligned(64, 33, AlignCenter, AlignCenter, b);
     cv.setFont(FontSecondary);
-    el_button_left("Dice"); el_button_center("Roll");
+    el_button_left(T("Dice","Wuerfel")); el_button_center(T("Roll","Wuerfeln"));
     cv.flush();
     delay(25);
   }
@@ -151,16 +151,16 @@ static void appDice() {
 static void appWifiScan() {
   while (true) {
     cv.clear(); cv.drawIcon(52, 12, &A_Loading_24); cv.setFont(FontSecondary);
-    cv.drawStrAligned(64, 50, AlignCenter, AlignCenter, "Scanning WiFi..."); cv.flush();
+    cv.drawStrAligned(64, 50, AlignCenter, AlignCenter, T("Scanning WiFi...","Suche WLAN...")); cv.flush();
     WiFi.mode(WIFI_STA); WiFi.disconnect();
     int n = WiFi.scanNetworks(false, true);
-    if (n <= 0) { popup("No networks", "found", nullptr, 0, 0, 1500); WiFi.mode(WIFI_OFF); return; }
+    if (n <= 0) { popup(T("No networks","Keine Netze"), T("found","gefunden"), nullptr, 0, 0, 1500); WiFi.mode(WIFI_OFF); return; }
     std::vector<String> items;
     for (int i = 0; i < n; i++) {
       String s = WiFi.SSID(i); if (!s.length()) s = "(hidden)";
       items.push_back(String(WiFi.RSSI(i)) + "  " + s);
     }
-    items.push_back("Rescan");
+    items.push_back(T("Rescan","Neu suchen"));
     int sel = 0;
     while (true) {
       sel = submenu(nullptr, items, sel);
@@ -180,7 +180,7 @@ static void appWifiScan() {
 static void appBleScan() {
   while (true) {
     cv.clear(); cv.drawIcon(52, 12, &A_Loading_24); cv.setFont(FontSecondary);
-    cv.drawStrAligned(64, 50, AlignCenter, AlignCenter, "Scanning BLE (5s)..."); cv.flush();
+    cv.drawStrAligned(64, 50, AlignCenter, AlignCenter, T("Scanning BLE (5s)...","Suche BLE (5s)...")); cv.flush();
     BLEDevice::init("Momentum S3 KB");
     BLEScan* sc = BLEDevice::getScan();
     sc->setActiveScan(true); sc->setInterval(100); sc->setWindow(99);
@@ -194,8 +194,8 @@ static void appBleScan() {
       info.push_back(String(d.getAddress().toString().c_str()) + "\n" + String(d.getRSSI()) + " dBm" + (d.haveManufacturerData() ? "\nManufacturer data" : ""));
     }
     sc->clearResults();
-    if (!n) { popup("No devices", "found", nullptr, 0, 0, 1500); return; }
-    items.push_back("Rescan");
+    if (!n) { popup(T("No devices","Keine Geraete"), T("found","gefunden"), nullptr, 0, 0, 1500); return; }
+    items.push_back(T("Rescan","Neu suchen"));
     int sel = 0;
     while (true) {
       sel = submenu(nullptr, items, sel);
@@ -288,8 +288,8 @@ static void appWebFiles() {
     cv.drawStr(2, 22, "WiFi:  Momentum-S3");
     cv.drawStr(2, 32, "Pass:  momentum123");
     cv.drawStr(2, 42, "Open:  192.168.4.1");
-    char b[32]; snprintf(b, sizeof b, "Clients: %d", WiFi.softAPgetStationNum()); cv.drawStr(2, 52, b);
-    cv.drawStr(2, 62, timeValid() ? "Time synced" : "Time: open page to sync");
+    char b[32]; snprintf(b, sizeof b, T("Clients: %d","Geraete: %d"), WiFi.softAPgetStationNum()); cv.drawStr(2, 52, b);
+    cv.drawStr(2, 62, timeValid() ? T("Time synced","Zeit synchron") : T("Time: open page to sync","Zeit: Seite oeffnen"));
     cv.flush();
     delay(5);
   }
@@ -303,7 +303,7 @@ static void appWifiSpam();
 static void appApps() {
   int sel = 0;
   while (true) {
-    sel = submenu("Apps", {"Snake", "Dice", "Clock", "Flashlight", "WiFi Scanner", "WiFi Spam", "BLE Scanner", "BLE Spam", "Web Files"}, sel);
+    sel = submenu("Apps", {"Snake", T("Dice", "Wuerfel"), T("Clock", "Uhr"), T("Flashlight", "Taschenlampe"), "WiFi Scanner", "WiFi Spam", "BLE Scanner", "BLE Spam", "Web Files"}, sel);
     if (sel < 0) return;
     switch (sel) {
       case 0: appSnake(); break;

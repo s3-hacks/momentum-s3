@@ -23,14 +23,14 @@ static bool bruteForce(const UniRemote& u, const char* btn) {
     // Fortschritt (Hochformat 64x128)
     cv.clear();
     cv.setFont(FontPrimary);
-    cv.drawStrAligned(32, 40, AlignCenter, AlignCenter, "Sending");
+    cv.drawStrAligned(32, 40, AlignCenter, AlignCenter, T("Sending","Sende"));
     cv.setFont(FontSecondary);
     cv.drawStrAligned(32, 54, AlignCenter, AlignCenter, btn);
     el_progress(4, 64, 56, (float)done / total);
     char b[16]; snprintf(b, sizeof b, "%d/%d", done, total);
     cv.drawStrAligned(32, 84, AlignCenter, AlignCenter, b);
-    cv.drawStrAligned(32, 104, AlignCenter, AlignCenter, "Hold M5");
-    cv.drawStrAligned(32, 114, AlignCenter, AlignCenter, "to stop");
+    cv.drawStrAligned(32, 104, AlignCenter, AlignCenter, T("Hold M5","M5 halten"));
+    cv.drawStrAligned(32, 114, AlignCenter, AlignCenter, T("to stop","zum Stop"));
     cv.flush();
     irSendDb(u.sigs[i]);
     done++;
@@ -96,7 +96,7 @@ static void sendWithUi(const IrFileSig& s) {
   cv.clear();
   cv.drawIcon(0, 0, &I_InfraredLearnShort_128x31);
   cv.setFont(FontPrimary);
-  cv.drawStrAligned(64, 44, AlignCenter, AlignCenter, "Sending...");
+  cv.drawStrAligned(64, 44, AlignCenter, AlignCenter, T("Sending...","Sende..."));
   cv.setFont(FontSecondary);
   cv.drawStrAligned(64, 56, AlignCenter, AlignCenter, s.name.c_str());
   cv.flush();
@@ -117,10 +117,10 @@ static bool learnSignal(IrFileSig& out) {
     cv.clear();
     cv.drawIcon(0, 0, &I_InfraredLearnShort_128x31);
     cv.setFont(FontPrimary);
-    cv.drawStrAligned(64, 38, AlignCenter, AlignCenter, "Learning...");
+    cv.drawStrAligned(64, 38, AlignCenter, AlignCenter, T("Learning...","Lerne..."));
     cv.setFont(FontSecondary);
-    cv.drawStrAligned(64, 50, AlignCenter, AlignCenter, "Point the remote at IR port");
-    cv.drawStrAligned(64, 60, AlignCenter, AlignCenter, "and push the button");
+    cv.drawStrAligned(64, 50, AlignCenter, AlignCenter, T("Point the remote at IR port","Fernbedienung auf IR-Port"));
+    cv.drawStrAligned(64, 60, AlignCenter, AlignCenter, T("and push the button","und Taste druecken"));
     if ((millis() / 500) % 2) cv.drawDisc(120, 40, 2);
     cv.flush();
     delay(20);
@@ -134,11 +134,11 @@ static void saveLearned(IrFileSig sig, const char* remoteName = nullptr) {
   if (remoteName) strlcpy(rname, remoteName, sizeof rname);
   else {
     auto files = listFiles(irDir().c_str(), ".ir");
-    std::vector<String> opts = {"+ New remote"};
+    std::vector<String> opts = {T("+ New remote","+ Neue Fernbed.")};
     for (auto& f : files) opts.push_back(f);
-    int c = submenu("Save to", opts);
+    int c = submenu(T("Save to","Speichern unter"), opts);
     if (c < 0) return;
-    if (c == 0) { snprintf(rname, sizeof rname, "Remote%d", (int)files.size() + 1); if (!textInput("Name the remote", rname, 20)) return; }
+    if (c == 0) { snprintf(rname, sizeof rname, "Remote%d", (int)files.size() + 1); if (!textInput(T("Name the remote","Name der Fernbed."), rname, 20)) return; }
     else strlcpy(rname, opts[c].c_str(), sizeof rname);
   }
   char bname[24] = "";
@@ -146,11 +146,11 @@ static void saveLearned(IrFileSig sig, const char* remoteName = nullptr) {
   String path = irDir() + "/" + rname + ".ir";
   irLoadFile(path.c_str(), sigs);
   snprintf(bname, sizeof bname, "Button%d", (int)sigs.size() + 1);
-  if (!textInput("Name the signal", bname, 20)) return;
+  if (!textInput(T("Name the signal","Name des Signals"), bname, 20)) return;
   sig.name = bname;
   sigs.push_back(sig);
-  if (irSaveFile(path.c_str(), sigs)) { addXp(3); popup("Saved!", rname, &I_DolphinSaved_92x58, 0, 6, 1200); }
-  else popup("Error", "Could not save");
+  if (irSaveFile(path.c_str(), sigs)) { addXp(3); popup(T("Saved!","Gespeichert!"), rname, &I_DolphinSaved_92x58, 0, 6, 1200); }
+  else popup(T("Error","Fehler"), T("Could not save","Speichern fehlgeschlagen"));
 }
 
 static void learnNew(const char* remoteName = nullptr) {
@@ -158,8 +158,8 @@ static void learnNew(const char* remoteName = nullptr) {
     IrFileSig sig;
     if (!learnSignal(sig)) return;
     while (true) {
-      char info[40]; snprintf(info, sizeof info, "RAW, %d samples", (int)sig.raw.size());
-      int c = submenu(info, {"Send", "Save", "Retry"});
+      char info[40]; snprintf(info, sizeof info, T("RAW, %d samples","RAW, %d Werte"), (int)sig.raw.size());
+      int c = submenu(info, {T("Send","Senden"), T("Save","Speichern"), T("Retry","Nochmal")});
       if (c < 0) return;
       if (c == 0) { sig.name = "Learned"; sendWithUi(sig); continue; }
       if (c == 1) { saveLearned(sig, remoteName); return; }
@@ -176,21 +176,21 @@ static void openRemote(const String& name) {
     irLoadFile(path.c_str(), sigs);
     std::vector<String> items;
     for (auto& s : sigs) items.push_back(s.name);
-    items.push_back("+ Learn new button");
-    items.push_back("Delete remote");
+    items.push_back(T("+ Learn new button","+ Taste lernen"));
+    items.push_back(T("Delete remote","Fernbed. loeschen"));
     sel = submenu(name.c_str(), items, sel);
     if (sel < 0) return;
     if (sel < (int)sigs.size()) { sendWithUi(sigs[sel]); continue; }
     if (sel == (int)sigs.size()) { learnNew(name.c_str()); continue; }
-    if (dialogYesNo("Delete remote?", name.c_str(), "Cancel", "Delete")) { LittleFS.remove(path); return; }
+    if (dialogYesNo(T("Delete remote?","Loeschen?"), name.c_str(), T("Cancel","Abbrechen"), T("Delete","Loeschen"))) { LittleFS.remove(path); return; }
   }
 }
 
 static void savedRemotes() {
   while (true) {
     auto files = listFiles(irDir().c_str(), ".ir");
-    if (files.empty()) { popup("No saved remotes", "Learn one first or\nupload .ir via Web Files", nullptr, 0, 0, 2500); return; }
-    int c = submenu("Saved Remotes", files);
+    if (files.empty()) { popup(T("No saved remotes","Keine gespeichert"), T("Learn one first or\nupload .ir via Web Files", "Erst lernen oder\n.ir per Web Files laden"), nullptr, 0, 0, 2500); return; }
+    int c = submenu(T("Saved Remotes","Gespeicherte"), files);
     if (c < 0) return;
     openRemote(files[c]);
   }
@@ -199,13 +199,13 @@ static void savedRemotes() {
 static void appInfrared() {
   int sel = 0;
   while (true) {
-    sel = submenu(nullptr, {"Universal Remotes", "Learn New Remote", "Saved Remotes", "Signal Repeat"}, sel);
+    sel = submenu(nullptr, {T("Universal Remotes","Universal-Fernbed."), T("Learn New Remote","Neue lernen"), T("Saved Remotes","Gespeicherte"), T("Signal Repeat","Signal-Wiederhol.")}, sel);
     if (sel < 0) return;
     if (sel == 0) universalRemotes();
     if (sel == 1) learnNew();
     if (sel == 2) savedRemotes();
     if (sel == 3) {
-      std::vector<VarItem> v = {{"Repeat each signal", [] { return String(S.irRepeat) + "x"; }, [](int) { S.irRepeat = S.irRepeat % 3 + 1; }}};
+      std::vector<VarItem> v = {{T("Repeat each signal","Signal wiederholen"), [] { return String(S.irRepeat) + "x"; }, [](int) { S.irRepeat = S.irRepeat % 3 + 1; }}};
       varItemList("IR", v);
     }
   }

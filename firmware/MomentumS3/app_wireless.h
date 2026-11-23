@@ -59,7 +59,7 @@ static int bleWindows(uint8_t* pkt) {
 
 enum BleMode { BLE_IOS, BLE_ANDROID, BLE_WIN, BLE_ALL };
 static void bleSpam(BleMode mode) {
-  if (!dialogYesNo("BLE Spam", "Loest Pop-ups auf fremden\nGeraeten aus. Nur an\neigenen Geraeten nutzen!", "Cancel", "Start")) return;
+  if (!dialogYesNo("BLE Spam", T("Triggers pop-ups on\nnearby devices. Only use\non your own devices!", "Loest Pop-ups auf fremden\nGeraeten aus. Nur an\neigenen Geraeten nutzen!"), T("Cancel", "Abbrechen"), "Start")) return;
   BLEDevice::init("");
   BLEAdvertising* adv = BLEDevice::getAdvertising();
   adv->setMinInterval(0x20);
@@ -83,10 +83,10 @@ static void bleSpam(BleMode mode) {
     cv.setFont(FontPrimary);
     cv.drawStr(2, 12, "BLE Spam");
     cv.setFont(FontSecondary);
-    const char* mn = (mode == BLE_IOS) ? "Apple / iOS" : (mode == BLE_ANDROID) ? "Android (Fast Pair)" : (mode == BLE_WIN) ? "Windows (Swift Pair)" : "Alle Systeme";
+    const char* mn = (mode == BLE_IOS) ? "Apple / iOS" : (mode == BLE_ANDROID) ? "Android (Fast Pair)" : (mode == BLE_WIN) ? "Windows (Swift Pair)" : T("All systems", "Alle Systeme");
     cv.drawStr(2, 26, mn);
-    char b[32]; snprintf(b, sizeof b, "Pakete: %u", (unsigned)sent); cv.drawStr(2, 38, b);
-    cv.drawStr(2, 50, (millis() / 300) % 2 ? "Sende..." : "Sende ..");
+    char b[32]; snprintf(b, sizeof b, T("Packets: %u", "Pakete: %u"), (unsigned)sent); cv.drawStr(2, 38, b);
+    cv.drawStr(2, 50, (millis() / 300) % 2 ? T("Sending...", "Sende...") : T("Sending ..", "Sende .."));
     el_button_center("Stop");
     cv.flush();
     delay(40);
@@ -99,7 +99,7 @@ static void bleSpam(BleMode mode) {
 static void appBleSpam() {
   int sel = 0;
   while (true) {
-    sel = submenu("BLE Spam", {"Apple / iOS", "Android", "Windows", "Alle Systeme"}, sel);
+    sel = submenu("BLE Spam", {"Apple / iOS", "Android", "Windows", T("All systems", "Alle Systeme")}, sel);
     if (sel < 0) return;
     bleSpam((BleMode)sel);
   }
@@ -178,10 +178,10 @@ static void wifiSpam(WifiSpamMode mode, const char* customName = nullptr) {
     cv.setFont(FontPrimary);
     cv.drawStr(2, 12, "WiFi Spam");
     cv.setFont(FontSecondary);
-    const char* mn = (mode == WS_FUNNY) ? "Lustige Namen" : (mode == WS_CUSTOM) ? "Eigener Name" : "Zufalls-Namen";
+    const char* mn = (mode == WS_FUNNY) ? T("Funny names", "Lustige Namen") : (mode == WS_CUSTOM) ? T("Custom name", "Eigener Name") : T("Random names", "Zufalls-Namen");
     cv.drawStr(2, 26, mn);
     char b[32]; snprintf(b, sizeof b, "Beacons: %u", (unsigned)sent); cv.drawStr(2, 38, b);
-    cv.drawStr(2, 50, (millis() / 300) % 2 ? "Sende..." : "Sende ..");
+    cv.drawStr(2, 50, (millis() / 300) % 2 ? T("Sending...", "Sende...") : T("Sending ..", "Sende .."));
     el_button_center("Stop");
     cv.flush();
     delay(60);
@@ -193,14 +193,14 @@ static void wifiSpam(WifiSpamMode mode, const char* customName = nullptr) {
 static void appWifiSpam() {
   int sel = 0;
   while (true) {
-    sel = submenu("WiFi Spam", {"Zufalls-Namen", "Lustige Namen", "Eigener Name..."}, sel);
+    sel = submenu("WiFi Spam", {T("Random names", "Zufalls-Namen"), T("Funny names", "Lustige Namen"), T("Custom name...", "Eigener Name...")}, sel);
     if (sel < 0) return;
-    if (!dialogYesNo("WiFi Spam", "Fuellt die WLAN-Liste in\nder Naehe mit Fake-Netzen.\nNur zum Lernen nutzen!", "Cancel", "Start")) continue;
+    if (!dialogYesNo("WiFi Spam", T("Fills nearby WiFi lists\nwith fake networks.\nFor learning only!", "Fuellt die WLAN-Liste in\nder Naehe mit Fake-Netzen.\nNur zum Lernen nutzen!"), T("Cancel", "Abbrechen"), "Start")) continue;
     if (sel == 0) wifiSpam(WS_RANDOM);
     else if (sel == 1) wifiSpam(WS_FUNNY);
     else {
       char nm[20] = "FreeWiFi";
-      if (textInput("Netzwerk-Name", nm, 18)) wifiSpam(WS_CUSTOM, nm);
+      if (textInput(T("Network name", "Netzwerk-Name"), nm, 18)) wifiSpam(WS_CUSTOM, nm);
     }
   }
 }

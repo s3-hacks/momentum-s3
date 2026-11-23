@@ -19,6 +19,7 @@ struct Settings {
   int kbLayout = -1;         // -1 = en-US
   bool kbBle = false;
   int menuStyle = 0;         // 0 = DSi-Karussell, 1 = Liste
+  int lang = 0;              // 0 = English, 1 = Deutsch
   char name[16] = "Stick";
   uint32_t xp = 0;
 };
@@ -40,6 +41,7 @@ static void settingsLoad() {
   S.kbLayout = prefs.getInt("kbl", -1);
   S.kbBle = prefs.getBool("kbble", false);
   S.menuStyle = prefs.getInt("mstyle", 0);
+  S.lang = prefs.getInt("lang", 0);
   prefs.getString("name", S.name, sizeof(S.name));
   if (!S.name[0]) strcpy(S.name, "Stick");
   S.xp = prefs.getUInt("xp", 0);
@@ -52,9 +54,13 @@ static void settingsSave() {
   prefs.putBool("unlock", S.unlockAll); prefs.putBool("snd", S.sound); prefs.putBool("batp", S.showBatPct);
   prefs.putInt("irrep", S.irRepeat); prefs.putInt("kbl", S.kbLayout); prefs.putBool("kbble", S.kbBle);
   prefs.putInt("mstyle", S.menuStyle);
+  prefs.putInt("lang", S.lang);
   prefs.putString("name", S.name); prefs.putUInt("xp", S.xp);
   prefs.end();
 }
+
+// Uebersetzungs-Helfer: Englisch (Standard) oder Deutsch je nach S.lang
+static inline const char* T(const char* en, const char* de) { return S.lang ? de : en; }
 
 static const uint8_t BRIGHT_LV[] = {0, 20, 50, 90, 150, 255};
 static const uint32_t TIMEOUT_MS[] = {0, 15000, 30000, 60000, 120000};

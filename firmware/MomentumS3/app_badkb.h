@@ -9,13 +9,13 @@ static String layoutName() { return S.kbLayout < 0 || S.kbLayout >= KB_LAYOUT_CO
 static void badkbConfig() {
   int sel = 0;
   while (true) {
-    sel = submenu("Config", {String("Connection: ") + (S.kbBle ? "BLE" : "USB"), String("Keyboard layout: ") + layoutName()}, sel);
+    sel = submenu(T("Config","Konfig"), {String(T("Connection: ","Verbindung: ")) + (S.kbBle ? "BLE" : "USB"), String(T("Keyboard layout: ","Tastatur: ")) + layoutName()}, sel);
     if (sel < 0) { settingsSave(); return; }
     if (sel == 0) S.kbBle = !S.kbBle;
     if (sel == 1) {
       std::vector<String> l = {"en-US"};
       for (int i = 0; i < KB_LAYOUT_COUNT; i++) l.push_back(KB_LAYOUTS[i].name);
-      int c = submenu("Keyboard layout", l, S.kbLayout + 1);
+      int c = submenu(T("Keyboard layout","Tastatur-Layout"), l, S.kbLayout + 1);
       if (c >= 0) S.kbLayout = c - 1;
     }
     settingsSave();
@@ -78,13 +78,13 @@ static void badkbRun(const String& title, const char* text) {
     if (st == BK_DONE) pct = 100;
     if (st == BK_READY) {
       cv.drawIcon(4, 26, bleNow ? &I_Bad_BLE_48x22 : &I_UsbTree_48x22);
-      cv.drawStr(58, 36, "Ready");
-      cv.drawStr(58, 46, bleNow ? "Pair 'Momentum S3 KB'" : "Plug into a PC");
-      el_button_left("Config"); el_button_center("Run");
+      cv.drawStr(58, 36, T("Ready","Bereit"));
+      cv.drawStr(58, 46, bleNow ? T("Pair 'Momentum S3 KB'","Mit 'Momentum S3 KB'") : T("Plug into a PC","In PC stecken"));
+      el_button_left(T("Config","Konfig")); el_button_center(T("Run","Start"));
     } else if (st == BK_CONNECT) {
       cv.drawIcon(4, 26, bleNow ? &I_Bad_BLE_48x22 : &I_UsbTree_48x22);
-      cv.drawStr(58, 36, "Connect to");
-      cv.drawStr(58, 46, bleNow ? "device (BLE)" : "device (USB)");
+      cv.drawStr(58, 36, T("Connect to","Verbinde"));
+      cv.drawStr(58, 46, bleNow ? T("device (BLE)","Geraet (BLE)") : T("device (USB)","Geraet (USB)"));
       el_button_center("Stop");
     } else if (st == BK_RUN || st == BK_PAUSED || st == BK_WAITBTN) {
       bool f = (millis() / 500) % 2;
@@ -95,22 +95,22 @@ static void badkbRun(const String& title, const char* text) {
       cv.drawStr(114 - w, 42, b);
       cv.drawIcon(116, 28, &I_Percent_10x14);
       cv.setFont(FontSecondary);
-      cv.drawStr(28, 36, st == BK_RUN ? "Running" : st == BK_PAUSED ? "Paused" : "Press OK");
+      cv.drawStr(28, 36, st == BK_RUN ? T("Running","Laeuft") : st == BK_PAUSED ? T("Paused","Pause") : T("Press OK","OK druecken"));
       if (st == BK_RUN && millis() + 50 < wakeAt) { cv.drawIcon(28, 38, &I_Clock_18x18); }
-      el_button_center(st == BK_RUN ? "Pause" : "Resume");
+      el_button_center(st == BK_RUN ? T("Pause","Pause") : T("Resume","Weiter"));
     } else if (st == BK_DONE) {
       cv.drawIcon(4, 26, &I_Smile_18x18);
       cv.setFont(FontPrimary);
-      cv.drawStr(28, 40, "Done");
-      el_button_left("Config"); el_button_center("Run");
+      cv.drawStr(28, 40, T("Done","Fertig"));
+      el_button_left(T("Config","Konfig")); el_button_center(T("Run","Start"));
     } else if (st == BK_ERROR) {
       cv.drawIcon(4, 26, &I_Error_18x18);
       cv.setFont(FontPrimary);
-      char b[24]; snprintf(b, sizeof b, "ERROR line %d", bk.error_line);
+      char b[24]; snprintf(b, sizeof b, T("ERROR line %d","FEHLER Zeile %d"), bk.error_line);
       cv.drawStr(28, 33, b);
       cv.setFont(FontSecondary);
       cv.drawStr(28, 44, el_fit(bk.error, 98).c_str());
-      el_button_left("Config"); el_button_center("Run");
+      el_button_left(T("Config","Konfig")); el_button_center(T("Run","Start"));
     }
     cv.flush();
     delay(10);
@@ -128,7 +128,7 @@ static void appBadKb() {
     std::sort(files.begin(), files.end());
     for (auto& f : files) items.push_back(f);
     for (int i = 0; i < DEMO_SCRIPT_COUNT; i++) items.push_back(String("Demos/") + DEMO_SCRIPTS[i].name);
-    items.push_back("Config");
+    items.push_back(T("Config","Konfig"));
     sel = submenu("Bad KB", items, sel);
     if (sel < 0) return;
     if (sel == (int)items.size() - 1) { badkbConfig(); continue; }

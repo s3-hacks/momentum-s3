@@ -127,11 +127,11 @@ static void passport() {
     cv.drawIcon(11, 2, &I_passport_happy_46x49);
     cv.setFont(FontSecondary);
     cv.drawStr(59, 10, S.name);
-    cv.drawStr(59, 22, "Mood: Happy");
+    cv.drawStr(59, 22, T("Mood: Happy","Laune: Gut"));
     char b[24]; snprintf(b, sizeof b, "Level: %d", lv);
     cv.drawStr(59, 34, b);
     int prog = 0;
-    if (lv > DOLPHIN_LEVEL_COUNT) snprintf(b, sizeof b, "Max Level!");
+    if (lv > DOLPHIN_LEVEL_COUNT) snprintf(b, sizeof b, T("Max Level!","Max Level!"));
     else {
       uint32_t lo = lv >= 2 ? DOLPHIN_LEVELS[lv - 2] : 0, hi = DOLPHIN_LEVELS[lv - 1];
       uint32_t have = xp > lo ? xp - lo : 0, target = hi - lo;
