@@ -57,6 +57,25 @@ static void drawStatusBar() {
   drawBattery(100, 2);
 }
 
+// Kleine Akku-Anzeige oben rechts fuer Menues (nur Umriss + Fuellung + %)
+static void drawMenuBattery(int x = 103, int y = 2, bool showPct = true) {
+  int pct = M5.Power.getBatteryLevel();
+  if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+  bool chg = M5.Power.isCharging() == m5::Power_Class::is_charging;
+  cv.setColor(ColorBlack);
+  cv.drawFrame(x, y, 21, 9);            // Gehaeuse
+  cv.drawBox(x + 21, y + 2, 2, 5);      // Pluspol
+  cv.drawBox(x + 2, y + 2, (pct * 17) / 100, 5);  // Fuellung
+  if (showPct) {
+    cv.setFont(FontBatteryPercent);
+    char b[6]; snprintf(b, sizeof b, chg ? "+" : "%d", pct);
+    cv.drawStr(x - cv.strWidth(b) - 3, y + 8, b);
+  } else if (chg) {
+    cv.setColor(ColorWhite); cv.drawBox(x + 9, y + 2, 3, 5); cv.setColor(ColorBlack);
+    cv.drawLine(x + 11, y + 2, x + 8, y + 4); cv.drawLine(x + 8, y + 4, x + 11, y + 4); cv.drawLine(x + 11, y + 4, x + 8, y + 7);
+  }
+}
+
 // ---------------- Submenu (Flipper "submenu") ----------------
 struct MenuItem { String label; const Icon* icon; };
 // liefert Index oder -1 (Zurueck)
@@ -78,7 +97,8 @@ static int submenu(const char* header, const std::vector<String>& items, int sta
     int y0 = 0;
     if (header) {
       cv.setFont(FontPrimary);
-      cv.drawStr(4, 11, header);
+      cv.drawStr(4, 11, el_fit(header, 94).c_str());
+      drawMenuBattery();
       y0 = 16;
     }
     cv.setFont(FontSecondary);

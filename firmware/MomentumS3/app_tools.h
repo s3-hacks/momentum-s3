@@ -297,10 +297,13 @@ static void appWebFiles() {
   WiFi.softAPdisconnect(true); WiFi.mode(WIFI_OFF);
 }
 
+static void appBleSpam();  // in app_wireless.h
+static void appWifiSpam();
+
 static void appApps() {
   int sel = 0;
   while (true) {
-    sel = submenu("Apps", {"Snake", "Dice", "Clock", "Flashlight", "WiFi Scanner", "BLE Scanner", "Web Files"}, sel);
+    sel = submenu("Apps", {"Snake", "Dice", "Clock", "Flashlight", "WiFi Scanner", "WiFi Spam", "BLE Scanner", "BLE Spam", "Web Files"}, sel);
     if (sel < 0) return;
     switch (sel) {
       case 0: appSnake(); break;
@@ -308,8 +311,10 @@ static void appApps() {
       case 2: appClock(); break;
       case 3: appFlashlight(); break;
       case 4: appWifiScan(); break;
-      case 5: appBleScan(); break;
-      case 6: appWebFiles(); break;
+      case 5: appWifiSpam(); break;
+      case 6: appBleScan(); break;
+      case 7: appBleSpam(); break;
+      case 8: appWebFiles(); break;
     }
   }
 }

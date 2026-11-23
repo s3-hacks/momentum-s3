@@ -18,6 +18,7 @@
 #include "app_infrared.h"
 #include "app_badkb.h"
 #include "app_tools.h"
+#include "app_wireless.h"
 
 #define FW_VERSION "MNTM-S3 1.0"
 
@@ -131,6 +132,7 @@ static void mainMenu() {
           cv.drawStrAligned(px, py + height / 2 + 1, AlignCenter, AlignBottom, "TAR");
           cv.drawStrAligned(px + 9, py + height / 2 + 1, AlignCenter, AlignBottom, "T");
           cv.drawRFrame(0, 0, 128, 18, 3);
+          drawMenuBattery(104, 5, false);
           cv.drawLine(60, 18, 64, 26);
           cv.drawLine(64, 26, 68, 18);
           cv.setColor(ColorWhite);
@@ -164,6 +166,7 @@ static void mainMenu() {
     }
     el_frame(0, 21, 128 - 5, 21);
     el_scrollbar(mainPos, MAIN_COUNT);
+    drawMenuBattery(104, 2, false);
     cv.flush();
     delay(15);
   }
