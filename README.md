@@ -2,6 +2,10 @@
 
 **An unofficial port of the [Momentum Firmware](https://github.com/Next-Flip/Momentum-Firmware) look & feel for the M5Stack M5StickC S3 (M5StickS3).**
 
+## ⚡ [Install in your browser → momentums3.netlify.app](https://momentums3.netlify.app)
+
+No tools needed: open the link in **Chrome or Edge** on a computer, plug in the stick, click **Install**. You can back up your current firmware (e.g. Bruce) on the same page first.
+
 Momentum is a custom firmware for the Flipper Zero. The Flipper uses an STM32 chip plus radio hardware (Sub-GHz, NFC, RFID) that the M5StickS3 does not have, so a 1:1 port is impossible. Momentum S3 instead rebuilds the Momentum experience on the ESP32-S3. Wherever possible it reuses Momentum's own assets and code: icons, dolphin animations, fonts, IR databases, universal remote layouts, the DuckyScript interpreter and the keyboard layouts.
 
 > Not affiliated with or endorsed by the Momentum team or Flipper Devices.
@@ -30,9 +34,12 @@ The power button is not used.
 
 ## Install
 
+**Easiest:** use the **[web installer](https://momentums3.netlify.app)** (Chrome/Edge on a computer).
+
+**Manual:**
 1. Download `Momentum-S3-vX.X.bin` from the [Releases](../../releases) page.
 2. Put the stick into download mode: hold the **side reset button ~2 s** until the green LED blinks.
-3. Flash the file at address **0x0**, for example with the [ESP Web Flasher](https://espressif.github.io/esptool-js/) (Chrome/Edge) or with esptool:
+3. Flash the file at address **0x0**, for example with esptool:
    ```
    esptool.py --chip esp32s3 write_flash 0x0 Momentum-S3-vX.X.bin
    ```
